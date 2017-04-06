@@ -1,0 +1,65 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.IO;
+using System.Data;
+using System.Data.OleDb;
+using System.Data.SqlClient;
+using System.Configuration;
+
+
+public partial class _Default : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+    }
+
+    protected void btnUpload_Click(object sender, EventArgs e)
+    {
+        string excelPath = Path.GetFullPath(File1.PostedFile.FileName);
+        File1.SaveAs(excelPath);
+        string conString = string.Empty;
+        string extension = Path.GetExtension(File1.PostedFile.FileName);
+        switch (extension)
+        {
+            case ".xls":
+                conString = ConfigurationManager.ConnectionStrings["Excel03ConString"].ConnectionString;
+                break;
+            case ".xlsx":
+                conString = ConfigurationManager.ConnectionStrings["Excel07+Constring"].ConnectionString;
+                break;
+        }
+        conString = string.Format(conString, excelPath);
+
+        using (OleDbConnection excel_con = new OleDbConnection(conString))
+        {
+            excel_con.Open();
+            string sheet1 = excel_con.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null).Rows[0]["TABLE_NAME"].ToString();
+            DataTable dtExcelData = new DataTable();
+
+            dtExcelData.Columns.AddRange(new DataColumn[2] {new DataColumn("ID",typeof(int)),
+            new DataColumn("CenterName", typeof(string)) });
+
+            using (OleDbDataAdapter oda=new OleDbDataAdapter("Select * from["+sheet1+"]", excel_con))
+            {
+                oda.Fill(dtExcelData);
+            }
+            excel_con.Close();
+
+            string CS = ConfigurationManager.ConnectionStrings["ExcelSheetDB"].ConnectionString;
+            using (SqlConnection connect = new SqlConnection(CS))
+            {
+                using (SqlBulkCopy sbc = new SqlBulkCopy(connect))
+                {
+                    sbc.DestinationTableName = "tblCenter";
+                    connect.Open();
+                    sbc.WriteToServer(dtExcelData);
+                }
+            }
+        }
+    }
+}
