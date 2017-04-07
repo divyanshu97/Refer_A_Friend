@@ -106,11 +106,11 @@ public partial class RefereeRegistration : System.Web.UI.Page
         #region Registration ID
         using (SqlConnection connect = new SqlConnection(CS)) // To match Registration Id with corresponding Name
         {
-            using (SqlCommand cmd = new SqlCommand("Select name from tblUploadedData where TPEnrollmentNo='" + tbxRegID.Text.Trim() + "'"))
+            using (SqlCommand cmd = new SqlCommand("Select FirstNameCandidate from checkUpload where TPEnrollmentnumber='" + tbxRegID.Text.Trim() + "'"))
             {
                 cmd.Connection = connect;
                 connect.Open();
-                name = cmd.ExecuteScalar().ToString();
+                name = cmd.ExecuteScalar().ToString().Trim();
             }
         }
         if (name != tbxName.Text)
@@ -125,9 +125,9 @@ public partial class RefereeRegistration : System.Web.UI.Page
         objReferee.Name = tbxName.Text.Trim();
         objReferee.Email = tbxEmail.Text.Trim();
         objReferee.Mobile = tbxMobile.Text.Trim();
-        objReferee.RegistrationID = Convert.ToInt32(tbxRegID.Text.Trim());
-        objReferee.CenterID = Center;
-        objReferee.BankID = Bank;
+        objReferee.RegistrationID = tbxRegID.Text.Trim().ToString();
+        objReferee.CenterID = Center.ToString();
+        objReferee.BankID = Bank.ToString();
         objReferee.AccountType = rblAccountType.SelectedValue;
         objReferee.AccountNo = tbxAccountNo.Text.Trim();
         objReferee.AccountHolderName = tbxAccountHolder.Text.Trim();
@@ -169,7 +169,7 @@ public partial class RefereeRegistration : System.Web.UI.Page
             string CS = ConfigurationManager.ConnectionStrings["ReferAFriendCS"].ConnectionString;
             using (SqlConnection connect = new SqlConnection(CS))
             {
-                using (SqlCommand cmd = new SqlCommand("Select  count(*) from tblUploadedData where TPEnrollmentNo='" + tbxRegID.Text.Trim() + "'"))
+                using (SqlCommand cmd = new SqlCommand("Select  count(*) from checkUpload where TPEnrollmentnumber='" + tbxRegID.Text.Trim() + "'"))
                 {
                     cmd.Connection = connect;
                     connect.Open();
@@ -182,13 +182,13 @@ public partial class RefereeRegistration : System.Web.UI.Page
                 {
                         //lblMessage.Text = "ID Matched";
 
-                    using (SqlCommand cmd = new SqlCommand("Select ProposalNumber from tblUploadedData where TPEnrollmentNo='" + tbxRegID.Text.Trim() + "'"))
+                    using (SqlCommand cmd = new SqlCommand("Select FirstNameCandidate from checkUpload where TPEnrollmentnumber='" + tbxRegID.Text.Trim() + "'"))
                     {
                         cmd.Connection = connect;
                         connect.Open();
                         name = cmd.ExecuteScalar().ToString();
                     }
-                    if (name == tbxName.Text)
+                    if (name.Trim() == tbxName.Text.Trim())
                         lblMessage.Text = "ID Matched";
                     else
                         lblMessage.Text = "Invalid Registration Id";

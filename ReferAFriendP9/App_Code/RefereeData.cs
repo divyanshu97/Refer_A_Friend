@@ -20,9 +20,9 @@ namespace ReferAFriend
         public string Name { get; set; }
         public string Email { get; set; }
         public string Mobile { get; set; }
-        public int RegistrationID { get; set; }
-        public int CenterID { get; set; }
-        public int BankID { get; set; }
+        public string RegistrationID { get; set; }
+        public string CenterID { get; set; }
+        public string BankID { get; set; }
         public string AccountType { get; set; }
         public string AccountNo { get; set; }
         public string AccountHolderName { get; set; }
